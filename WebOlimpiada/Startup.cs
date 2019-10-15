@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WebOlimpiada.Data;
 
 namespace WebOlimpiada
 {
@@ -19,6 +21,9 @@ namespace WebOlimpiada
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(options => 
+                options.UseSqlite("Data Source=DbProducts.sqlite"));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // In production, the React files will be served from this directory
@@ -29,8 +34,10 @@ namespace WebOlimpiada
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
+             ApplicationDbContext dbContext)
         {
+            dbContext.Database.EnsureCreated();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -59,6 +66,8 @@ namespace WebOlimpiada
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            SeederDB.SeedData(app.ApplicationServices, env, this.Configuration);
         }
     }
 }
