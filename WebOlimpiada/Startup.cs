@@ -22,7 +22,7 @@ namespace WebOlimpiada
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => 
-                options.UseSqlite("Data Source=DbProducts.sqlite"));
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
