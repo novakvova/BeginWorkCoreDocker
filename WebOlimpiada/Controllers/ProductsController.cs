@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ namespace WebOlimpiada.Controllers
         [HttpGet]
         public IActionResult GetProducts()
         {
+            Thread.Sleep(2000);
             var model = _context.Products.Select(p => new ProductViewModel
             {
                 Id = p.Id,

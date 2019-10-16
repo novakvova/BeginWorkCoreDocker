@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import './index.css';
+import './index.scss';
 
 class EclipseWidgetContainer extends Component {
     render() {
         return (
-            <div className="eclipse" id="dlgProgress">
+            <div className="my_eclipse" id="dlgProgress">
                 <div className="progress">
                     <div>
                         <i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
