@@ -5,6 +5,7 @@ import get from 'lodash.get';
 import * as productsActions from './reducer';
 import EclipseWidget from '../eclipse';
 import ProductItem from './ProductItem';
+import './index.scss';
 
 const propTypes = {
   getProducts: PropTypes.func.isRequired,
@@ -46,7 +47,7 @@ class ProductsPage extends Component {
     return (
       <div>
         <h1>List Products</h1>
-        <table className="table">
+        <table className="table table-striped table-hover products_table">
           <thead>
             <tr>
               <th scope="col">Product</th>

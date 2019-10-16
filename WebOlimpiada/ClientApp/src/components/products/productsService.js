@@ -7,4 +7,7 @@ export default class ProductsService {
     static getProducts() {
         return axios.get(`${serverUrl}api/Products`)
     };
+    static addProduct(product) {
+        return axios.post(`${serverUrl}api/Products`, product)
+    };
 }

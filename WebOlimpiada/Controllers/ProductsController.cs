@@ -22,7 +22,7 @@ namespace WebOlimpiada.Controllers
         [HttpGet]
         public IActionResult GetProducts()
         {
-            Thread.Sleep(2000);
+            //Thread.Sleep(2000);
             var model = _context.Products.Select(p => new ProductViewModel
             {
                 Id = p.Id,

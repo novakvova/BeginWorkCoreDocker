@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { MdCreate,MdDelete} from "react-icons/md";
 
 class ProductItem extends Component {
     state = { 
@@ -12,12 +13,15 @@ class ProductItem extends Component {
         return { id: props.id, name: props.name, category: props.category };
       }
     render() {
-        const {id, name, category} = this.state;
+        const { id, name, category } = this.state;
         return (
             <tr key={id}>
                 <td>{name}</td>
                 <td>{category}</td>
-                <td> </td>
+                <td> 
+                    <a className="edit"><MdCreate /></a>
+                    <a className="delete"><MdDelete /></a>
+                </td>
             </tr>
         );
     }
