@@ -9,7 +9,7 @@ class ProductItem extends Component {
      }
 
      static getDerivedStateFromProps(props, state) {
-        console.log('---nextProps---', props);
+        //console.log('---nextProps---', props);
         return { id: props.id, name: props.name, category: props.category };
       }
     render() {
@@ -19,8 +19,8 @@ class ProductItem extends Component {
                 <td>{name}</td>
                 <td>{category}</td>
                 <td> 
-                    <a className="edit"><MdCreate /></a>
-                    <a className="delete"><MdDelete /></a>
+                    <a href="#" className="edit"><MdCreate /></a>
+                    <a href="#" className="delete"><MdDelete /></a>
                 </td>
             </tr>
         );

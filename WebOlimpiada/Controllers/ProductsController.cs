@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebOlimpiada.Data;
+using WebOlimpiada.Helpers;
 using WebOlimpiada.ViewModels;
 
 namespace WebOlimpiada.Controllers
@@ -19,18 +20,75 @@ namespace WebOlimpiada.Controllers
         {
             _context = context;
         }
-        [HttpGet]
-        public IActionResult GetProducts()
+        [HttpGet("{page}")]
+        public IActionResult GetProducts(int page=1)
         {
+            var query = _context.Products.AsQueryable();
             //Thread.Sleep(2000);
-            var model = _context.Products.Select(p => new ProductViewModel
+            int pageSize = 4;
+            int pageNo = page - 1;
+
+            var products = query
+                .OrderBy(p => p.Name)
+                .Skip(pageNo * pageSize)
+                .Take(pageSize)
+                .Select(p => new ProductViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Category = p.Category.Name
+                })
+                .ToList();
+
+            int allCount = query.Count();
+            ProductPageModel model = new ProductPageModel
             {
-                Id = p.Id,
-                Name = p.Name,
-                Category = p.Category.Name
-            }).ToList();
+                Data = products,
+                CurrentPage = page,
+                TotalPage = (int)Math.Ceiling((double)allCount / pageSize)
+            };
 
             return Ok(model);
+        }
+        [HttpPost]
+        public IActionResult AddProducts([FromBody]ProductAddViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errrors = CustomValidator.GetErrorsByModel(ModelState);
+                return BadRequest(errrors);
+            }
+            try
+            {
+                var cat = _context.Categories.SingleOrDefault(c => c.Name == model.Category);
+                if(cat==null)
+                {
+                    cat = new Category
+                    {
+                        Name = model.Category
+                    };
+                    _context.Categories.Add(cat);
+                    _context.SaveChanges();
+                }
+                var product = new Product
+                {
+                    CategoryId=cat.Id,
+                    Name=model.Name
+                };
+                _context.Products.Add(product);
+                _context.SaveChanges();
+                var result = new ProductViewModel
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Category = cat.Name
+                };
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest(new { invalid = "Помилка збереження даних!" });
+            }
         }
     }
 }
