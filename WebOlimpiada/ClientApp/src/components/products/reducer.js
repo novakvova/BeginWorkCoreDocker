@@ -5,6 +5,10 @@ export const ADD_PRODUCT_STARTED = "product/ADD_PRODUCT_STARTED";
 export const ADD_PRODUCT_SUCCESS = "product/ADD_PRODUCT_SUCCESS";
 export const ADD_PRODUCT_FAILED = "product/ADD_PRODUCT_STARTED";
 
+export const FETCH_PRODUCT_STARTED = "product/FETCH_PRODUCT_STARTED";
+export const FETCH_PRODUCT_SUCCESS = "product/FETCH_PRODUCT_SUCCESS";
+export const FETCH_PRODUCT_FAILED = "product/FETCH_PRODUCT_STARTED";
+
 export const FETCH_PRODUCTS_STARTED = "products/FETCH_PRODUCTS_STARTED";
 export const FETCH_PRODUCTS_SUCCESS = "products/FETCH_PRODUCTS_SUCCESS";
 export const FETCH_PRODUCTS_FAILED = "products/FETCH_PRODUCTS_FAILED";
@@ -24,6 +28,18 @@ const initialState = {
         failed: false,
         errors: {}
     },
+
+    edit: {
+        product: {
+            id: -1,
+            name: '',
+            category: ''
+        },
+        loading: false,
+        success: false,
+        failed: false,
+        errors: {}
+    }
 }
 
 
@@ -31,12 +47,11 @@ export const productsReducer = (state = initialState, action) => {
     let newState = state;
 
     switch (action.type) {
-//-----------------LIST OF PRODUCT---------------------------
+//-----------------LIST OF PRODUCTS---------------------------
         case FETCH_PRODUCTS_STARTED: {
             newState = update.set(state, 'list.loading', true);
             newState = update.set(newState, 'list.success', false);
             newState = update.set(newState, 'list.failed', false);
-            //newState = update.set(newState, 'list.data', []);
             break;
         }
 
@@ -48,9 +63,6 @@ export const productsReducer = (state = initialState, action) => {
                 success: true,
                 ...action.payload.data
             });
-            // newState = update.set(state, 'list.loading', false);
-            // newState = update.set(newState, 'list.success', true);
-            // newState = update.set(newState, 'list.data', action.payload.data.products);
             break;
         }
 
@@ -58,6 +70,29 @@ export const productsReducer = (state = initialState, action) => {
             newState = update.set(state, 'list.loading', false);
             newState = update.set(newState, 'list.data', []);
             newState = update.set(newState, 'list.failed', true);
+            break;
+        }
+
+        //-----------------GET PRODUCT BY ID---------------------------
+        case FETCH_PRODUCT_STARTED: {
+            newState = update.set(state, 'edit.loading', true);
+            newState = update.set(newState, 'edit.success', false);
+            newState = update.set(newState, 'edit.failed', false);
+            break;
+        }
+
+        case FETCH_PRODUCT_SUCCESS: {
+            newState = update.set(state, 'edit.loading', false);
+            newState = update.set(newState, 'edit.success', true);
+            newState = update.set(newState, 'edit.failed', false);
+            newState = update.set(newState, 'edit.product', action.payload.data);
+            break;
+        }
+
+        case FETCH_PRODUCT_FAILED: {
+            newState = update.set(state, 'edit.loading', false);
+            newState = update.set(newState, 'edit.data', []);
+            newState = update.set(newState, 'edit.failed', true);
             break;
         }
         //-----------------ADD PRODUCT---------------------------
@@ -115,6 +150,40 @@ export const productsGetActions = {
     failed: (error) => {
         return {
             type: FETCH_PRODUCTS_FAILED
+        }
+    }
+}
+
+//Отримати список товарів
+export const getProduct = (id) => {
+    return (dispatch) => {
+        dispatch(productsGetActions.started());
+
+        ProductsService.getProduct(id)
+            .then((response) => {
+                dispatch(productGetActions.success(response));
+            })
+            .catch(() => {
+                dispatch(productGetActions.failed());
+            });
+    }
+}
+
+export const productGetActions = {
+    started: () => {
+        return {
+            type: FETCH_PRODUCT_STARTED
+        }
+    },
+    success: (data) => {
+        return {
+            type: FETCH_PRODUCT_SUCCESS,
+            payload: data
+        }
+    },
+    failed: (error) => {
+        return {
+            type: FETCH_PRODUCT_FAILED
         }
     }
 }

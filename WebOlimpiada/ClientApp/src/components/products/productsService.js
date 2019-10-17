@@ -5,9 +5,14 @@ import {serverUrl} from '../../config';
 export default class ProductsService {
 
     static getProducts(page) {
-        return axios.get(`${serverUrl}api/Products/${page}`)
+        return axios.get(`${serverUrl}api/Products/${page}`);
     };
+
     static addProduct(product) {
-        return axios.post(`${serverUrl}api/Products`, product)
+        return axios.post(`${serverUrl}api/Products`, product);
+    };
+
+    static getProduct(id) {
+        return axios.get(`${serverUrl}api/Products/edit/${id}`);
     };
 }

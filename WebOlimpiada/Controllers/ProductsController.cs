@@ -50,6 +50,24 @@ namespace WebOlimpiada.Controllers
 
             return Ok(model);
         }
+
+        [HttpGet("edit/{id}")]
+        public IActionResult EditProduct(int id)
+        {
+            var model = _context.Products
+                .Select(p => new ProductViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Category = p.Category.Name
+                }).SingleOrDefault(prod=>prod.Id==id);
+
+            if (model == null)
+                return NotFound();          
+   
+            return Ok(model);
+        }
+
         [HttpPost]
         public IActionResult AddProducts([FromBody]ProductAddViewModel model)
         {
