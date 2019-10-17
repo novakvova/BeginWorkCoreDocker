@@ -20,7 +20,7 @@ class ProductItem extends Component {
                 <td>{category}</td>
                 <td> 
                     <a href="#" className="edit"><MdCreate /></a>
-                    <a href="#" className="delete"><MdDelete /></a>
+                    <a href="#" className="delete"><MdDelete/></a>
                 </td>
             </tr>
         );

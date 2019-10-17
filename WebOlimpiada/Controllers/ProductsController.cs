@@ -53,6 +53,7 @@ namespace WebOlimpiada.Controllers
         [HttpPost]
         public IActionResult AddProducts([FromBody]ProductAddViewModel model)
         {
+            Thread.Sleep(3000);
             if (!ModelState.IsValid)
             {
                 var errrors = CustomValidator.GetErrorsByModel(ModelState);

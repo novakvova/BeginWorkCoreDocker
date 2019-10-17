@@ -12,12 +12,18 @@ import './index.scss';
 
 const propTypes = {
   getProducts: PropTypes.func.isRequired,
+  addProduct: PropTypes.func.isRequired,
+
   IsLoading: PropTypes.bool.isRequired,
   IsFailed: PropTypes.bool.isRequired,
   IsSuccess: PropTypes.bool.isRequired,
+
   products: PropTypes.array.isRequired,
+
   currentPage: PropTypes.number.isRequired,
   totalPage: PropTypes.number.isRequired,
+
+  add: PropTypes.object.isRequired
 };
 
 const defaultProps = {};
@@ -32,7 +38,8 @@ class ProductsPage extends Component {
       pagination: {
         currentPage: 1,
         totalPage: 1
-      }
+      },
+      add: {}
     }
   }
 
@@ -44,20 +51,27 @@ class ProductsPage extends Component {
       pagination: {
         currentPage: props.currentPage,
         totalPage: props.totalPage
-      }
+      },
+      add: { ...props.add }
     };
   }
 
   componentDidMount() {
-    this.props.getProducts(1);
+    this.props.getProducts();
   }
 
   callBackParams = (page) =>{
     this.props.getProducts(page);
   }
 
+  addProductToTable = (model) => {
+    const {pagination} = this.state;
+    this.props.addProduct(model, pagination.currentPage);
+  }
+
   render() {
-    const {loading, products, pagination} = this.state;
+    const {loading, products, pagination, add} = this.state;
+    //console.log('----add----', add);
     //console.log('---this.props---', this.props);
     //console.log('-------this.state--------', this.state);
     const productContent = products.map((product) =>
@@ -66,7 +80,7 @@ class ProductsPage extends Component {
     return (
       <div>
         <h1>List Products</h1>
-        <AddProduct />
+        <AddProduct {...add} addProduct={this.addProductToTable} />
         <table className="table table-striped table-hover products_table">
           <thead>
             <tr>
@@ -96,12 +110,21 @@ const mapState = (state) => {
     products: get(state, 'products.list.data'),
     currentPage: get(state, 'products.list.currentPage'),
     totalPage: get(state, 'products.list.totalPage'),
+    add: 
+    {
+      IsLoading: get(state, 'products.add.loading'),
+      IsFailed: get(state, 'products.add.failed'),
+      IsSuccess: get(state, 'products.add.success'),
+    }
   }
 }
 
 const mapDispatch = {
   getProducts: (page) => {
     return productsActions.getProducts(page);
+  },
+  addProduct: (product, currentPage) => {
+    return productsActions.addProduct(product, currentPage);
   }
 }
 

@@ -94,7 +94,7 @@ export const productsReducer = (state = initialState, action) => {
 }
 
 //Отримати список товарів
-export const getProducts = (page) => {
+export const getProducts = (page=1) => {
     return (dispatch) => {
         AddUpdateProducts(page,dispatch);
     }
@@ -127,6 +127,7 @@ export const addProduct = (model, page) => {
         ProductsService.addProduct(model)
             .then((response) => {
                 dispatch(productAddActions.success(response));
+
                 AddUpdateProducts(page, dispatch);
                 //UpdateListProducts
                 //history.push('gallery');
