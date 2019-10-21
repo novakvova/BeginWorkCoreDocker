@@ -7,6 +7,7 @@ import EclipseWidget from '../eclipse';
 import ProductItem from './ProductItem';
 import AddProduct from './AddProduct';
 import EditProduct from './EditProduct';
+import DeleteProduct from './DeleteProduct';
 import ItemPagination from './ItemPagination';
 import './index.scss';
 
@@ -14,7 +15,16 @@ import './index.scss';
 const propTypes = {
   getProducts: PropTypes.func.isRequired,
   addProduct: PropTypes.func.isRequired,
-  getProduct: PropTypes.func.isRequired,
+
+  //Edit product
+  editProduct: PropTypes.func.isRequired,
+  getEditProduct: PropTypes.func.isRequired,
+  cancelEditProduct: PropTypes.func.isRequired,
+
+  //Delete product
+  deleteProduct: PropTypes.func.isRequired,
+  getDeleteProduct: PropTypes.func.isRequired,
+  cancelDeleteProduct: PropTypes.func.isRequired,
 
   IsLoading: PropTypes.bool.isRequired,
   IsFailed: PropTypes.bool.isRequired,
@@ -27,6 +37,7 @@ const propTypes = {
 
   add: PropTypes.object.isRequired,
   edit: PropTypes.object.isRequired,
+  delete: PropTypes.object.isRequired,
   //product: PropTypes.oneOfType([PropTypes.oneOf([null]).isRequired, PropTypes.object]).isRequired
 };
 
@@ -77,16 +88,42 @@ class ProductsPage extends Component {
     this.props.editProduct(model);
   }
 
+  cancelEditProductTotable = () => {
+    this.props.cancelEditProduct();
+  }
+
+  deleteProductTotable = (id) => {
+    const {pagination} = this.state;
+    this.props.deleteProduct(id, pagination.currentPage);
+  }
+
+  cancelDeleteProductTotable = () => {
+    this.props.cancelDeleteProduct();
+  }
+
   render() {
     const {loading, products, pagination, add} = this.state;
     const productContent = products.map((product) =>
-      <ProductItem key={product.id} {...product} getProduct = {this.props.getProduct} />
+      <ProductItem key={product.id} {...product} 
+        getEditProduct = {this.props.getEditProduct} 
+        getDeleteProduct = {this.props.getDeleteProduct}
+        />
     );
     return (
       <div>
         <h1>List Products</h1>
         <AddProduct {...add} addProduct={this.addProductToTable} /> 
-        {this.props.edit.product && <EditProduct {...this.props.edit} editProduct={this.editProductTotable} /> }
+        {this.props.edit.product && 
+        <EditProduct {...this.props.edit} 
+          editProduct={this.editProductTotable}
+          cancelEditProduct =  {this.cancelEditProductTotable} /> }
+
+        {this.props.delete.product && 
+          <DeleteProduct {...this.props.delete} 
+            deleteProduct={this.deleteProductTotable}
+            cancelDeleteProduct =  {this.cancelDeleteProductTotable}
+           /> }
+
         <table className="table table-striped table-hover products_table">
           <thead>
             <tr>
@@ -127,6 +164,12 @@ const mapState = (state) => {
       IsLoading: get(state, 'products.edit.loading'),
       IsFailed: get(state, 'products.edit.failed'),
       IsSuccess: get(state, 'products.edit.success'),
+    },
+    delete: {
+      product: get(state, 'products.delete.product'),
+      IsLoading: get(state, 'products.delete.loading'),
+      IsFailed: get(state, 'products.delete.failed'),
+      IsSuccess: get(state, 'products.delete.success'),
     }
     
   }
@@ -143,9 +186,26 @@ const mapDispatch = {
   editProduct: (product) => {
     return productsActions.editProduct(product);
   },
-  getProduct: (id) => {
-    return productsActions.getProduct(id);
-  }
+
+  cancelEditProduct: () => {
+    return productsActions.cancelEditProduct();
+  },
+
+  getEditProduct: (id) => {
+    return productsActions.getEditProduct(id);
+  },
+
+  getDeleteProduct: (id) => {
+    return productsActions.getDeleteProduct(id);
+  },
+
+  deleteProduct: (id, page) => {
+    return productsActions.deleteProduct(id, page);
+  },
+
+  cancelDeleteProduct: () => {
+    return productsActions.cancelDeleteProduct();
+  },
 }
 
 ProductsPage.propTypes = propTypes;

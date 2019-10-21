@@ -5,13 +5,23 @@ export const ADD_PRODUCT_STARTED = "product/ADD_PRODUCT_STARTED";
 export const ADD_PRODUCT_SUCCESS = "product/ADD_PRODUCT_SUCCESS";
 export const ADD_PRODUCT_FAILED = "product/ADD_PRODUCT_STARTED";
 
-export const FETCH_PRODUCT_STARTED = "product/FETCH_PRODUCT_STARTED";
-export const FETCH_PRODUCT_SUCCESS = "product/FETCH_PRODUCT_SUCCESS";
-export const FETCH_PRODUCT_FAILED = "product/FETCH_PRODUCT_STARTED";
+export const FETCH_EDIT_PRODUCT_STARTED = "product/FETCH_EDIT_PRODUCT_STARTED";
+export const FETCH_EDIT_PRODUCT_SUCCESS = "product/FETCH_EDIT_PRODUCT_SUCCESS";
+export const FETCH_EDIT_PRODUCT_FAILED = "product/FETCH_EDIT_PRODUCT_FAILED";
+
+export const FETCH_DELETE_PRODUCT_STARTED = "product/FETCH_DELETE_PRODUCT_STARTED";
+export const FETCH_DELETE_PRODUCT_SUCCESS = "product/FETCH_DELETE_PRODUCT_SUCCESS";
+export const FETCH_DELETE_PRODUCT_FAILED = "product/FETCH_DELETE_PRODUCT_FAILED";
+
+export const DELETE_PRODUCT_STARTED = "product/DELETE_PRODUCT_STARTED";
+export const DELETE_PRODUCT_SUCCESS = "product/DELETE_PRODUCT_SUCCESS";
+export const DELETE_PRODUCT_FAILED = "product/DELETE_PRODUCT_FAILED";
+export const DELETE_PRODUCT_CANCEL = "product/DELETE_PRODUCT_CANCEL";
 
 export const EDIT_PRODUCT_STARTED = "product/EDIT_PRODUCT_STARTED";
 export const EDIT_PRODUCT_SUCCESS = "product/EDIT_PRODUCT_SUCCESS";
-export const EDIT_PRODUCT_FAILED = "product/EDIT_PRODUCT_STARTED";
+export const EDIT_PRODUCT_FAILED = "product/EDIT_PRODUCT_FAILED";
+export const EDIT_PRODUCT_CANCEL = "product/EDIT_PRODUCT_CANCEL";
 
 export const FETCH_PRODUCTS_STARTED = "products/FETCH_PRODUCTS_STARTED";
 export const FETCH_PRODUCTS_SUCCESS = "products/FETCH_PRODUCTS_SUCCESS";
@@ -40,6 +50,15 @@ const initialState = {
         failed: false,
         errors: {}
     },
+
+    delete: {
+        product: null,
+        loading: false,
+        success: false,
+        failed: false,
+        errors: {}
+    },
+
 }
 
 
@@ -47,7 +66,7 @@ export const productsReducer = (state = initialState, action) => {
     let newState = state;
 
     switch (action.type) {
-//-----------------LIST OF PRODUCTS---------------------------
+        //-----------------LIST OF PRODUCTS---------------------------
         case FETCH_PRODUCTS_STARTED: {
             newState = update.set(state, 'list.loading', true);
             newState = update.set(newState, 'list.success', false);
@@ -56,13 +75,13 @@ export const productsReducer = (state = initialState, action) => {
         }
 
         case FETCH_PRODUCTS_SUCCESS: {
-            newState = update.set(state, 'list', 
-            {
-                ...state.list, 
-                loading: false,
-                success: true,
-                ...action.payload.data
-            });
+            newState = update.set(state, 'list',
+                {
+                    ...state.list,
+                    loading: false,
+                    success: true,
+                    ...action.payload.data
+                });
             break;
         }
 
@@ -73,15 +92,16 @@ export const productsReducer = (state = initialState, action) => {
             break;
         }
 
-        //-----------------GET PRODUCT BY ID---------------------------
-        case FETCH_PRODUCT_STARTED: {
+        //-----------------GET PRODUCT BY ID EDIT---------------------------
+        case FETCH_EDIT_PRODUCT_STARTED: {
             newState = update.set(state, 'edit.loading', true);
             newState = update.set(newState, 'edit.success', false);
             newState = update.set(newState, 'edit.failed', false);
+            newState = update.set(newState, 'edit.product', null);
             break;
         }
 
-        case FETCH_PRODUCT_SUCCESS: {
+        case FETCH_EDIT_PRODUCT_SUCCESS: {
             newState = update.set(state, 'edit.loading', false);
             newState = update.set(newState, 'edit.success', true);
             newState = update.set(newState, 'edit.failed', false);
@@ -89,12 +109,37 @@ export const productsReducer = (state = initialState, action) => {
             break;
         }
 
-        case FETCH_PRODUCT_FAILED: {
+        case FETCH_EDIT_PRODUCT_FAILED: {
             newState = update.set(state, 'edit.loading', false);
-            newState = update.set(newState, 'edit.data', []);
+            newState = update.set(newState, 'edit.product', null);
             newState = update.set(newState, 'edit.failed', true);
             break;
         }
+        //-----------------GET PRODUCT BY ID DELETE---------------------------
+        case FETCH_DELETE_PRODUCT_STARTED: {
+            newState = update.set(state, 'delete.loading', true);
+            newState = update.set(newState, 'delete.success', false);
+            newState = update.set(newState, 'delete.failed', false);
+            newState = update.set(newState, 'delete.product', null)
+            break;
+        }
+
+        case FETCH_DELETE_PRODUCT_SUCCESS: {
+
+            newState = update.set(state, 'delete.loading', false);
+            newState = update.set(newState, 'delete.success', true);
+            newState = update.set(newState, 'delete.failed', false);
+            newState = update.set(newState, 'delete.product', action.payload.data);
+            break;
+        }
+
+        case FETCH_DELETE_PRODUCT_FAILED: {
+            newState = update.set(state, 'delete.loading', false);
+            newState = update.set(newState, 'delete.product', null);
+            newState = update.set(newState, 'delete.failed', true);
+            break;
+        }
+
         //-----------------ADD PRODUCT---------------------------
         case ADD_PRODUCT_STARTED: {
             newState = update.set(state, 'add.loading', true);
@@ -106,7 +151,7 @@ export const productsReducer = (state = initialState, action) => {
         case ADD_PRODUCT_SUCCESS: {
             newState = update.set(state, 'add.loading', false);
             newState = update.set(newState, 'add.failed', false);
-            
+
             //console.log('----Add product id----',action.payload.data);
             newState = update.set(newState, 'list.data', [...newState.list.data, action.payload.data]);
             newState = update.set(newState, 'add.errors', {});
@@ -131,13 +176,12 @@ export const productsReducer = (state = initialState, action) => {
         case EDIT_PRODUCT_SUCCESS: {
             newState = update.set(state, 'edit.loading', false);
             newState = update.set(newState, 'edit.failed', false);
-            
+
             //console.log('----Add product id----',action.payload.data);
-            newState = update.set(newState, 
-                'list.data',  
-                newState.list.data.map(item => 
-                {
-                    if (item.id === action.payload.data.id) 
+            newState = update.set(newState,
+                'list.data',
+                newState.list.data.map(item => {
+                    if (item.id === action.payload.data.id)
                         return action.payload.data;
                     return item;
                 })
@@ -148,11 +192,56 @@ export const productsReducer = (state = initialState, action) => {
             newState = update.set(newState, 'edit.success', true);
             break;
         }
+
+        case EDIT_PRODUCT_CANCEL: {
+            newState = update.set(state, 'edit.loading', false);
+            newState = update.set(newState, 'edit.failed', false);
+            newState = update.set(newState, 'edit.product', null);
+            newState = update.set(newState, 'edit.errors', {});
+            break;
+        }
         case EDIT_PRODUCT_FAILED: {
             newState = update.set(state, 'edit.loading', false);
             newState = update.set(newState, 'edit.success', false);
             newState = update.set(newState, 'edit.errors', action.errors);
             newState = update.set(newState, 'edit.failed', true);
+            break;
+        }
+
+        //-----------------DELETE PRODUCT---------------------------
+        case DELETE_PRODUCT_STARTED: {
+            newState = update.set(state, 'delete.loading', true);
+            newState = update.set(newState, 'delete.success', false);
+            newState = update.set(newState, 'delete.errors', {});
+            newState = update.set(newState, 'delete.failed', false);
+            break;
+        }
+        case DELETE_PRODUCT_SUCCESS: {
+            newState = update.set(state, 'delete.loading', false);
+            newState = update.set(newState, 'delete.failed', false);
+
+            newState = update.set(newState,
+                'list.data',
+                newState.list.data.filter(item => item.id !== action.payload.data.id)
+                );
+            newState = update.set(newState, 'delete.product', null);
+            newState = update.set(newState, 'delete.errors', {});
+            newState = update.set(newState, 'delete.success', true);
+            break;
+        }
+
+        case DELETE_PRODUCT_CANCEL: {
+            newState = update.set(state, 'delete.loading', false);
+            newState = update.set(newState, 'delete.failed', false);
+            newState = update.set(newState, 'delete.product', null);
+            newState = update.set(newState, 'delete.errors', {});
+            break;
+        }
+        case DELETE_PRODUCT_FAILED: {
+            newState = update.set(state, 'delete.loading', false);
+            newState = update.set(newState, 'delete.success', false);
+            newState = update.set(newState, 'delete.errors', action.errors);
+            newState = update.set(newState, 'delete.failed', true);
             break;
         }
 
@@ -165,9 +254,9 @@ export const productsReducer = (state = initialState, action) => {
 }
 
 //Отримати список товарів
-export const getProducts = (page=1) => {
+export const getProducts = (page = 1) => {
     return (dispatch) => {
-        AddUpdateProducts(page,dispatch);
+        AddUpdateProducts(page, dispatch);
     }
 }
 
@@ -190,40 +279,73 @@ export const productsGetActions = {
     }
 }
 
-//Отримати один продукт по id
-export const getProduct = (id) => {
+//Отримати один продукт по id для редагування
+export const getEditProduct = (id) => {
     return (dispatch) => {
-        dispatch(productGetActions.started());
+        dispatch(getEditProductActions.started());
 
         ProductsService.getProduct(id)
             .then((response) => {
-                dispatch(productGetActions.success(response));
+                dispatch(getEditProductActions.success(response));
             })
             .catch(() => {
-                dispatch(productGetActions.failed());
+                dispatch(getEditProductActions.failed());
             });
     }
 }
 
-export const productGetActions = {
+export const getEditProductActions = {
     started: () => {
         return {
-            type: FETCH_PRODUCT_STARTED
+            type: FETCH_EDIT_PRODUCT_STARTED
         }
     },
     success: (data) => {
         return {
-            type: FETCH_PRODUCT_SUCCESS,
+            type: FETCH_EDIT_PRODUCT_SUCCESS,
             payload: data
         }
     },
     failed: (error) => {
         return {
-            type: FETCH_PRODUCT_FAILED
+            type: FETCH_EDIT_PRODUCT_FAILED
         }
     }
 }
 
+//Отримати один продукт по id для видалення
+export const getDeleteProduct = (id) => {
+    return (dispatch) => {
+        dispatch(getDeleteProductActions.started());
+
+        ProductsService.getProduct(id)
+            .then((response) => {
+                dispatch(getDeleteProductActions.success(response));
+            })
+            .catch(() => {
+                dispatch(getDeleteProductActions.failed());
+            });
+    }
+}
+
+export const getDeleteProductActions = {
+    started: () => {
+        return {
+            type: FETCH_DELETE_PRODUCT_STARTED
+        }
+    },
+    success: (data) => {
+        return {
+            type: FETCH_DELETE_PRODUCT_SUCCESS,
+            payload: data
+        }
+    },
+    failed: (error) => {
+        return {
+            type: FETCH_DELETE_PRODUCT_FAILED
+        }
+    }
+}
 
 //Додати продукт товарів
 export const addProduct = (model, page) => {
@@ -236,8 +358,8 @@ export const addProduct = (model, page) => {
                 AddUpdateProducts(page, dispatch);
                 //UpdateListProducts
                 //history.push('gallery');
-            }, err=> { throw err; })
-            .catch(err=> {
+            }, err => { throw err; })
+            .catch(err => {
                 dispatch(productAddActions.failed(err.response));
                 //redirectStatusCode(err.response.status);
             });
@@ -275,11 +397,18 @@ export const editProduct = (model) => {
                 //AddUpdateProducts(page, dispatch);
                 //UpdateListProducts
                 //history.push('gallery');
-            }, err=> { throw err; })
-            .catch(err=> {
+            }, err => { throw err; })
+            .catch(err => {
                 dispatch(productEditActions.failed(err.response));
                 //redirectStatusCode(err.response.status);
             });
+    }
+}
+
+//Змінити продукт товарів
+export const cancelEditProduct = () => {
+    return (dispatch) => {
+        dispatch(productEditActions.cancel());
     }
 }
 
@@ -300,8 +429,65 @@ export const productEditActions = {
             type: EDIT_PRODUCT_FAILED,
             errors: response.data
         }
+    },
+    cancel: () => {
+        return {
+            type: EDIT_PRODUCT_CANCEL
+        }
     }
 }
+
+//Видалити продукт товарів
+export const deleteProduct = (id, page) => {
+    return (dispatch) => {
+        dispatch(deleteProductActions.started());
+        ProductsService.deleteProduct(id)
+            .then((response) => {
+                dispatch(deleteProductActions.success(response));
+
+                AddUpdateProducts(page, dispatch);
+                //UpdateListProducts
+                //history.push('gallery');
+            }, err => { throw err; })
+            .catch(err => {
+                dispatch(deleteProductActions.failed(err.response));
+                //redirectStatusCode(err.response.status);
+            });
+    }
+}
+
+//Змінити продукт товарів
+export const cancelDeleteProduct = () => {
+    return (dispatch) => {
+        dispatch(deleteProductActions.cancel());
+    }
+}
+
+export const deleteProductActions = {
+    started: () => {
+        return {
+            type: DELETE_PRODUCT_STARTED
+        }
+    },
+    success: (data) => {
+        return {
+            type: DELETE_PRODUCT_SUCCESS,
+            payload: data
+        }
+    },
+    failed: (response) => {
+        return {
+            type: DELETE_PRODUCT_FAILED,
+            errors: response.data
+        }
+    },
+    cancel: () => {
+        return {
+            type: DELETE_PRODUCT_CANCEL
+        }
+    }
+}
+
 
 //Update list products
 const AddUpdateProducts = (page, dispatch) => {

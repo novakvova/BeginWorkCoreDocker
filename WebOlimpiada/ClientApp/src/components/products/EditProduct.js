@@ -6,6 +6,7 @@ import { Button, Modal, ModalHeader, ModalFooter, ModalBody } from 'reactstrap';
 
 const propTypes = {
   editProduct: PropTypes.func.isRequired,
+  cancelEditProduct: PropTypes.func.isRequired,
   IsLoading: PropTypes.bool.isRequired,
   IsFailed: PropTypes.bool.isRequired,
   IsSuccess: PropTypes.bool.isRequired,
@@ -24,7 +25,6 @@ class EditProduct extends Component {
   }
 
   UNSAFE_componentWillReceiveProps = (nextProps) => {
-    //console.log(nextProps.product);
     const { product } = nextProps;
     this.setState({
       _id: product ? product.id : null,
@@ -80,47 +80,36 @@ class EditProduct extends Component {
     return (
       <>
         <Modal isOpen={true}>
-          <form >
-            <ModalHeader>Видалити фото?</ModalHeader>
+          <form onSubmit={this.handleSubmit} className="form-horizontal">
+            <ModalHeader>Редагувати продукта</ModalHeader>
             <ModalBody>
-              <div className="container">
-                <form className="form-horizontal">
-                  <div className="form-group row">
-                    <div className="col-md-6">
-                      <div className="row">
-                        <label htmlFor="first_name" className="col-md-4 col-form-label">Product</label>
-                        <div className="col-md-8">
-                          <input type="text"
-                            className={classnames('form-control', { 'is-invalid': !!errors.name })}
-                            name="name"
-                            id="name"
-                            value={name}
-                            onChange={this.handleChange} />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="row">
-                        <label htmlFor="first_name" className="col-md-4 col-form-label">Category</label>
-                        <div className="col-md-8">
-                          <input type="text"
-                            className={classnames('form-control', { 'is-invalid': !!errors.category })}
-                            name="category"
-                            id="category"
-                            value={category}
-                            onChange={this.handleChange} />
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                </form>
+              <div className="form-group">
+                <label htmlFor="first_name" className="col-form-label">Product</label>
+
+                <input type="text"
+                  className={classnames('form-control', { 'is-invalid': !!errors.name })}
+                  name="name"
+                  id="name"
+                  value={name}
+                  onChange={this.handleChange} />
+
               </div>
+              <div className="form-group">
+                <label htmlFor="first_name" className=" col-form-label">Category</label>
+
+                <input type="text"
+                  className={classnames('form-control', { 'is-invalid': !!errors.category })}
+                  name="category"
+                  id="category"
+                  value={category}
+                  onChange={this.handleChange} />
+              </div>
+
 
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={this.handleSubmit} className="btn btn-primary">Зберенти</Button>
-              <Button color="danger" onClick={this.toggleDialogDelete} >Скасувати</Button>
+              <Button color="primary" onClick={this.handleSubmit} className="btn btn-primary">Зберегти</Button>
+              <Button color="danger" onClick={this.props.cancelEditProduct} >Скасувати</Button>
             </ModalFooter>
           </form>
         </Modal>

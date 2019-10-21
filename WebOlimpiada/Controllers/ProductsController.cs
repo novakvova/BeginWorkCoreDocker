@@ -157,5 +157,41 @@ namespace WebOlimpiada.Controllers
                 return BadRequest(new { invalid = "Помилка збереження даних!" });
             }
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteProduct(int id)
+        {
+            Thread.Sleep(3000);
+            if (!ModelState.IsValid)
+            {
+                var errrors = CustomValidator.GetErrorsByModel(ModelState);
+                return BadRequest(errrors);
+            }
+
+
+            if (id == 0)
+                return NotFound();
+            try
+            {
+                
+                var product = _context.Products.SingleOrDefault(c => c.Id == id);
+                if (product != null)
+                {
+                    _context.Remove(product);
+                    _context.SaveChanges();
+                    var result = new ProductViewModel
+                    {
+                        Id = product.Id
+                    };
+                    return Ok(result);
+                }
+                else
+                    return NotFound();
+            }
+            catch
+            {
+                return BadRequest(new { invalid = "Помилка збереження даних!" });
+            }
+        }
     }
 }

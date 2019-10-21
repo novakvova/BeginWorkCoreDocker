@@ -34,5 +34,10 @@ namespace WebOlimpiada.ViewModels
         [Required(ErrorMessage = "Поле не може бути пустим!")]
         public string Category { get; set; }
     }
-    
+    public class ProductDeleteViewModel
+    {
+        [Required(ErrorMessage = "Поле не може бути пустим!")]
+        public int Id { get; set; }
+    }
+
 }

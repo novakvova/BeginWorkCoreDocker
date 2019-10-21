@@ -3,7 +3,8 @@ import { MdCreate, MdDelete } from "react-icons/md";
 import PropTypes from "prop-types";
 
 const propTypes = {
-    getProduct: PropTypes.func.isRequired,
+    getEditProduct: PropTypes.func.isRequired,
+    getDeleteProduct: PropTypes.func.isRequired,
 
 };
 
@@ -22,7 +23,12 @@ class ProductItem extends Component {
 
     editProduct = (e, id) => {
         e.preventDefault();
-        this.props.getProduct(id);
+        this.props.getEditProduct(id);
+    }
+
+    deleteProduct = (e, id) => {
+        e.preventDefault();
+        this.props.getDeleteProduct(id);
     }
 
     render() {
@@ -33,7 +39,7 @@ class ProductItem extends Component {
                 <td>{category}</td>
                 <td>
                     <a href="#" onClick={(e) => this.editProduct(e, id)} className="edit"><MdCreate /></a>
-                    <a href="#" className="delete"><MdDelete /></a>
+                    <a href="#" onClick={(e) => this.deleteProduct(e, id)} className="delete"><MdDelete /></a>
                 </td>
             </tr>
         );
