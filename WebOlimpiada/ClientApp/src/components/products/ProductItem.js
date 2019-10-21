@@ -1,30 +1,46 @@
 import React, { Component } from 'react';
-import { MdCreate,MdDelete} from "react-icons/md";
+import { MdCreate, MdDelete } from "react-icons/md";
+import PropTypes from "prop-types";
+
+const propTypes = {
+    getProduct: PropTypes.func.isRequired,
+
+};
+
+const defaultProps = {};
 
 class ProductItem extends Component {
-    state = { 
+    state = {
         id: 0,
         name: '',
         category: ''
-     }
+    }
 
-     static getDerivedStateFromProps(props, state) {
-        //console.log('---nextProps---', props);
+    static getDerivedStateFromProps(props, state) {
         return { id: props.id, name: props.name, category: props.category };
-      }
+    }
+
+    editProduct = (e, id) => {
+        e.preventDefault();
+        this.props.getProduct(id);
+    }
+
     render() {
         const { id, name, category } = this.state;
         return (
             <tr key={id}>
                 <td>{name}</td>
                 <td>{category}</td>
-                <td> 
-                    <a href="#" className="edit"><MdCreate /></a>
-                    <a href="#" className="delete"><MdDelete/></a>
+                <td>
+                    <a href="#" onClick={(e) => this.editProduct(e, id)} className="edit"><MdCreate /></a>
+                    <a href="#" className="delete"><MdDelete /></a>
                 </td>
             </tr>
         );
     }
 }
- 
+
+ProductItem.propTypes = propTypes;
+ProductItem.defaultProps = defaultProps;
+
 export default ProductItem;

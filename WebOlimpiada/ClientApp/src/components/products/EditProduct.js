@@ -2,32 +2,36 @@ import React, { Component } from 'react';
 import classnames from "classnames";
 import PropTypes from "prop-types";
 import EclipseWidget from '../eclipse';
+import { Button, Modal, ModalHeader, ModalFooter, ModalBody } from 'reactstrap';
 
 const propTypes = {
-  getProduct: PropTypes.func.isRequired,
   editProduct: PropTypes.func.isRequired,
   IsLoading: PropTypes.bool.isRequired,
   IsFailed: PropTypes.bool.isRequired,
   IsSuccess: PropTypes.bool.isRequired,
-  id: PropTypes.number.isRequired,
-  name: PropTypes.string.isRequired,
-  category: PropTypes.string.isRequired,
+  product: PropTypes.object
 };
 
 const defaultProps = {};
 
 class EditProduct extends Component {
   state = {
-    id: -1,
-    name: '',
-    category: '',
+    _id: this.props.product ? this.props.product.id : null,
+    name: this.props.product ? this.props.product.name : '',
+    category: this.props.product ? this.props.product.category : '',
     errors: {},
     IsLoading: false
   }
 
-  componentDidMount() {
-    const { id } = this.state;
-    this.props.getProduct(id);
+  UNSAFE_componentWillReceiveProps = (nextProps) => {
+    //console.log(nextProps.product);
+    const { product } = nextProps;
+    this.setState({
+      _id: product ? product.id : null,
+      name: product ? product.name : '',
+      category: product ? product.category : '',
+      IsLoading: nextProps.IsLoading
+    });
   }
 
   setStateByErrors = (name, value) => {
@@ -47,25 +51,10 @@ class EditProduct extends Component {
     this.setStateByErrors(e.target.name, e.target.value);
   };
 
-  static getDerivedStateFromProps(props, state) {
-    if(state.id==-1)
-    {
-      return {
-        id: props.id,
-        name: props.name,
-        category: props.category,
-        IsLoading: props.IsLoading,
-      };
-    }
-    return { 
-      IsLoading: props.IsLoading,
-    };
-  }
-
   handleSubmit = (e) => {
     e.preventDefault();
 
-    const { name, category } = this.state;
+    const { _id, name, category } = this.state;
     let errors = {};
     if (name === "") errors.name = "Поле не може бути пустим!";
     if (category === "") errors.category = "Поле не може бути пустим!";
@@ -74,11 +63,13 @@ class EditProduct extends Component {
     if (isValid) {
 
       const model = {
+        Id: _id,
         Name: name,
         Category: category
       };
-      this.props.addProduct(model);
-      this.setState({ name: "", category: "" });
+      console.log('Model', model);
+      this.props.editProduct(model);
+      //this.setState({ name: "", category: "" });
     } else {
       this.setState({ errors });
     }
@@ -88,41 +79,55 @@ class EditProduct extends Component {
     const { name, category, errors, IsLoading } = this.state;
     return (
       <>
-        <div className="container">
-          <form className="form-horizontal" onSubmit={this.handleSubmit} >
-            <div className="form-group row">
-              <div className="col-md-5">
-                <div className="row">
-                  <label htmlFor="first_name" className="col-md-4 col-form-label">Product</label>
-                  <div className="col-md-8">
-                    <input type="text"
-                      className={classnames('form-control', { 'is-invalid': !!errors.name })}
-                      name="name"
-                      id="name"
-                      value={name}
-                      onChange={this.handleChange} />
+        <Modal isOpen={true}>
+          <form >
+            <ModalHeader>Видалити фото?</ModalHeader>
+            <ModalBody>
+              <div className="container">
+                <form className="form-horizontal">
+                  <div className="form-group row">
+                    <div className="col-md-6">
+                      <div className="row">
+                        <label htmlFor="first_name" className="col-md-4 col-form-label">Product</label>
+                        <div className="col-md-8">
+                          <input type="text"
+                            className={classnames('form-control', { 'is-invalid': !!errors.name })}
+                            name="name"
+                            id="name"
+                            value={name}
+                            onChange={this.handleChange} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="row">
+                        <label htmlFor="first_name" className="col-md-4 col-form-label">Category</label>
+                        <div className="col-md-8">
+                          <input type="text"
+                            className={classnames('form-control', { 'is-invalid': !!errors.category })}
+                            name="category"
+                            id="category"
+                            value={category}
+                            onChange={this.handleChange} />
+                        </div>
+                      </div>
+                    </div>
+                    
                   </div>
-                </div>
+                </form>
               </div>
-              <div className="col-md-5">
-                <div className="row">
-                  <label htmlFor="first_name" className="col-md-4 col-form-label">Category</label>
-                  <div className="col-md-8">
-                    <input type="text"
-                      className={classnames('form-control', { 'is-invalid': !!errors.category })}
-                      name="category"
-                      id="category"
-                      value={category}
-                      onChange={this.handleChange} />
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-2 mt-4 mt-md-0">
-                <input type="submit" className="btn btn-success btn-block" value="Add" />
-              </div>
-            </div>
+
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={this.handleSubmit} className="btn btn-primary">Зберенти</Button>
+              <Button color="danger" onClick={this.toggleDialogDelete} >Скасувати</Button>
+            </ModalFooter>
           </form>
-        </div>
+        </Modal>
+
+        {/*  */}
+
+
         {IsLoading && <EclipseWidget />}
       </>
     );

@@ -15,4 +15,8 @@ export default class ProductsService {
     static getProduct(id) {
         return axios.get(`${serverUrl}api/Products/edit/${id}`);
     };
+
+    static editProduct(product) {
+        return axios.put(`${serverUrl}api/Products`, product);
+    };
 }

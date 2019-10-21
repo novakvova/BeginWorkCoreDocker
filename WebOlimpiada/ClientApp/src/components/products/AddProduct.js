@@ -7,18 +7,33 @@ const propTypes = {
   addProduct: PropTypes.func.isRequired,
   IsLoading: PropTypes.bool.isRequired,
   IsFailed: PropTypes.bool.isRequired,
-  IsSuccess: PropTypes.bool.isRequired
+  IsSuccess: PropTypes.bool.isRequired,
 };
 
 const defaultProps = {};
 
 class AddProduct extends Component {
   state = {
-    name: '',
-    category: '',
+    _id: this.props.product ? this.props.product._id : null,
+    name: this.props.product ? this.props.product.name : '',
+    category: this.props.category ? this.props.product.category : '',
     errors: {},
     IsLoading: false
   }
+
+  UNSAFE_componentWillReceiveProps = (nextProps) => {
+    //console.log(nextProps.product);
+    const { product } = nextProps;
+    this.setState({
+      _id: product ? product._id : null,
+      name: product ? product.name : '',
+      category: product ? product.category : '',
+      IsLoading: nextProps.IsLoading
+    });
+  }
+
+  
+
 
   setStateByErrors = (name, value) => {
     if (!!this.state.errors[name]) {
@@ -36,11 +51,11 @@ class AddProduct extends Component {
   handleChange = e => {
     this.setStateByErrors(e.target.name, e.target.value);
   };
-  static getDerivedStateFromProps(props, state) {
-    return { 
-      IsLoading: props.IsLoading,
-    };
-  }
+  // static getDerivedStateFromProps(props, state) {
+  //   return { 
+  //     IsLoading: props.IsLoading,
+  //   };
+  // }
 
   handleSubmit = (e) => {
     e.preventDefault();

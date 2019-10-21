@@ -6,6 +6,7 @@ import * as productsActions from './reducer';
 import EclipseWidget from '../eclipse';
 import ProductItem from './ProductItem';
 import AddProduct from './AddProduct';
+import EditProduct from './EditProduct';
 import ItemPagination from './ItemPagination';
 import './index.scss';
 
@@ -13,6 +14,7 @@ import './index.scss';
 const propTypes = {
   getProducts: PropTypes.func.isRequired,
   addProduct: PropTypes.func.isRequired,
+  getProduct: PropTypes.func.isRequired,
 
   IsLoading: PropTypes.bool.isRequired,
   IsFailed: PropTypes.bool.isRequired,
@@ -23,7 +25,9 @@ const propTypes = {
   currentPage: PropTypes.number.isRequired,
   totalPage: PropTypes.number.isRequired,
 
-  add: PropTypes.object.isRequired
+  add: PropTypes.object.isRequired,
+  edit: PropTypes.object.isRequired,
+  //product: PropTypes.oneOfType([PropTypes.oneOf([null]).isRequired, PropTypes.object]).isRequired
 };
 
 const defaultProps = {};
@@ -69,18 +73,20 @@ class ProductsPage extends Component {
     this.props.addProduct(model, pagination.currentPage);
   }
 
+  editProductTotable = (model) => {
+    this.props.editProduct(model);
+  }
+
   render() {
     const {loading, products, pagination, add} = this.state;
-    //console.log('----add----', add);
-    //console.log('---this.props---', this.props);
-    //console.log('-------this.state--------', this.state);
     const productContent = products.map((product) =>
-      <ProductItem key={product.id} {...product} />
+      <ProductItem key={product.id} {...product} getProduct = {this.props.getProduct} />
     );
     return (
       <div>
         <h1>List Products</h1>
-        <AddProduct {...add} addProduct={this.addProductToTable} />
+        <AddProduct {...add} addProduct={this.addProductToTable} /> 
+        {this.props.edit.product && <EditProduct {...this.props.edit} editProduct={this.editProductTotable} /> }
         <table className="table table-striped table-hover products_table">
           <thead>
             <tr>
@@ -96,7 +102,7 @@ class ProductsPage extends Component {
 
         {loading && <EclipseWidget />}
 
-        <ItemPagination callBackParams={this.callBackParams} {...pagination} />
+         <ItemPagination callBackParams={this.callBackParams} {...pagination} />
       </div>
     );
   }
@@ -115,7 +121,14 @@ const mapState = (state) => {
       IsLoading: get(state, 'products.add.loading'),
       IsFailed: get(state, 'products.add.failed'),
       IsSuccess: get(state, 'products.add.success'),
+    },
+    edit: {
+      product: get(state, 'products.edit.product'),
+      IsLoading: get(state, 'products.edit.loading'),
+      IsFailed: get(state, 'products.edit.failed'),
+      IsSuccess: get(state, 'products.edit.success'),
     }
+    
   }
 }
 
@@ -125,6 +138,13 @@ const mapDispatch = {
   },
   addProduct: (product, currentPage) => {
     return productsActions.addProduct(product, currentPage);
+  },
+
+  editProduct: (product) => {
+    return productsActions.editProduct(product);
+  },
+  getProduct: (id) => {
+    return productsActions.getProduct(id);
   }
 }
 

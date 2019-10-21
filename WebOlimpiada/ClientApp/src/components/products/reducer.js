@@ -9,6 +9,10 @@ export const FETCH_PRODUCT_STARTED = "product/FETCH_PRODUCT_STARTED";
 export const FETCH_PRODUCT_SUCCESS = "product/FETCH_PRODUCT_SUCCESS";
 export const FETCH_PRODUCT_FAILED = "product/FETCH_PRODUCT_STARTED";
 
+export const EDIT_PRODUCT_STARTED = "product/EDIT_PRODUCT_STARTED";
+export const EDIT_PRODUCT_SUCCESS = "product/EDIT_PRODUCT_SUCCESS";
+export const EDIT_PRODUCT_FAILED = "product/EDIT_PRODUCT_STARTED";
+
 export const FETCH_PRODUCTS_STARTED = "products/FETCH_PRODUCTS_STARTED";
 export const FETCH_PRODUCTS_SUCCESS = "products/FETCH_PRODUCTS_SUCCESS";
 export const FETCH_PRODUCTS_FAILED = "products/FETCH_PRODUCTS_FAILED";
@@ -30,16 +34,12 @@ const initialState = {
     },
 
     edit: {
-        product: {
-            id: -1,
-            name: '',
-            category: ''
-        },
+        product: null,
         loading: false,
         success: false,
         failed: false,
         errors: {}
-    }
+    },
 }
 
 
@@ -108,7 +108,7 @@ export const productsReducer = (state = initialState, action) => {
             newState = update.set(newState, 'add.failed', false);
             
             //console.log('----Add product id----',action.payload.data);
-            //newState = update.set(newState, 'list.data', [...newState.list.data, action.payload.data]);
+            newState = update.set(newState, 'list.data', [...newState.list.data, action.payload.data]);
             newState = update.set(newState, 'add.errors', {});
             newState = update.set(newState, 'add.success', true);
             break;
@@ -120,6 +120,42 @@ export const productsReducer = (state = initialState, action) => {
             newState = update.set(newState, 'add.failed', true);
             break;
         }
+        //-----------------EDIT PRODUCT---------------------------
+        case EDIT_PRODUCT_STARTED: {
+            newState = update.set(state, 'edit.loading', true);
+            newState = update.set(newState, 'edit.success', false);
+            newState = update.set(newState, 'edit.errors', {});
+            newState = update.set(newState, 'edit.failed', false);
+            break;
+        }
+        case EDIT_PRODUCT_SUCCESS: {
+            newState = update.set(state, 'edit.loading', false);
+            newState = update.set(newState, 'edit.failed', false);
+            
+            //console.log('----Add product id----',action.payload.data);
+            newState = update.set(newState, 
+                'list.data',  
+                newState.list.data.map(item => 
+                {
+                    if (item.id === action.payload.data.id) 
+                        return action.payload.data;
+                    return item;
+                })
+            );
+            newState = update.set(newState, 'edit.product', null);
+            //newState = update.set(newState, 'list.data', [...newState.list.data, action.payload.data]);
+            newState = update.set(newState, 'edit.errors', {});
+            newState = update.set(newState, 'edit.success', true);
+            break;
+        }
+        case EDIT_PRODUCT_FAILED: {
+            newState = update.set(state, 'edit.loading', false);
+            newState = update.set(newState, 'edit.success', false);
+            newState = update.set(newState, 'edit.errors', action.errors);
+            newState = update.set(newState, 'edit.failed', true);
+            break;
+        }
+
         default: {
             return newState;
         }
@@ -154,10 +190,10 @@ export const productsGetActions = {
     }
 }
 
-//Отримати список товарів
+//Отримати один продукт по id
 export const getProduct = (id) => {
     return (dispatch) => {
-        dispatch(productsGetActions.started());
+        dispatch(productGetActions.started());
 
         ProductsService.getProduct(id)
             .then((response) => {
@@ -189,7 +225,7 @@ export const productGetActions = {
 }
 
 
-//Отримати список товарів
+//Додати продукт товарів
 export const addProduct = (model, page) => {
     return (dispatch) => {
         dispatch(productAddActions.started());
@@ -223,6 +259,45 @@ export const productAddActions = {
     failed: (response) => {
         return {
             type: ADD_PRODUCT_FAILED,
+            errors: response.data
+        }
+    }
+}
+
+//Змінити продукт товарів
+export const editProduct = (model) => {
+    return (dispatch) => {
+        dispatch(productEditActions.started());
+        ProductsService.editProduct(model)
+            .then((response) => {
+                dispatch(productEditActions.success(response));
+
+                //AddUpdateProducts(page, dispatch);
+                //UpdateListProducts
+                //history.push('gallery');
+            }, err=> { throw err; })
+            .catch(err=> {
+                dispatch(productEditActions.failed(err.response));
+                //redirectStatusCode(err.response.status);
+            });
+    }
+}
+
+export const productEditActions = {
+    started: () => {
+        return {
+            type: EDIT_PRODUCT_STARTED
+        }
+    },
+    success: (data) => {
+        return {
+            type: EDIT_PRODUCT_SUCCESS,
+            payload: data
+        }
+    },
+    failed: (response) => {
+        return {
+            type: EDIT_PRODUCT_FAILED,
             errors: response.data
         }
     }

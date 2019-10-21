@@ -52,7 +52,7 @@ namespace WebOlimpiada.Controllers
         }
 
         [HttpGet("edit/{id}")]
-        public IActionResult EditProduct(int id)
+        public IActionResult GetEditProductById(int id)
         {
             var model = _context.Products
                 .Select(p => new ProductViewModel
@@ -69,7 +69,7 @@ namespace WebOlimpiada.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddProducts([FromBody]ProductAddViewModel model)
+        public IActionResult AddProduct([FromBody]ProductAddViewModel model)
         {
             Thread.Sleep(3000);
             if (!ModelState.IsValid)
@@ -103,6 +103,54 @@ namespace WebOlimpiada.Controllers
                     Category = cat.Name
                 };
                 return Ok(result);
+            }
+            catch
+            {
+                return BadRequest(new { invalid = "Помилка збереження даних!" });
+            }
+        }
+
+        [HttpPut]
+        public IActionResult EditProduct([FromBody]ProductEditViewModel model)
+        {
+            Thread.Sleep(3000);
+            if (!ModelState.IsValid)
+            {
+                var errrors = CustomValidator.GetErrorsByModel(ModelState);
+                return BadRequest(errrors);
+            }
+           
+
+            if (model == null)
+                return NotFound();
+            try
+            {
+                var cat = _context.Categories.SingleOrDefault(c => c.Name == model.Category);
+                if (cat == null)
+                {
+                    cat = new Category
+                    {
+                        Name = model.Category
+                    };
+                    _context.Categories.Add(cat);
+                    _context.SaveChanges();
+                }
+                var product = _context.Products.SingleOrDefault(c => c.Id == model.Id);
+                if(product!=null)
+                {
+                    product.Name = model.Name;
+                    product.CategoryId = cat.Id;
+                    _context.SaveChanges();
+                    var result = new ProductViewModel
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        Category = cat.Name
+                    };
+                    return Ok(result);
+                }
+                else
+                    return NotFound();
             }
             catch
             {

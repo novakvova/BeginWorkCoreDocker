@@ -25,4 +25,14 @@ namespace WebOlimpiada.ViewModels
         [Required(ErrorMessage = "Поле не може бути пустим!")]
         public string Category { get; set; }
     }
+    public class ProductEditViewModel
+    {
+        [Required(ErrorMessage = "Поле не може бути пустим!")]
+        public int Id { get; set; }
+        [Required(ErrorMessage = "Поле не може бути пустим!")]
+        public string Name { get; set; }
+        [Required(ErrorMessage = "Поле не може бути пустим!")]
+        public string Category { get; set; }
+    }
+    
 }
