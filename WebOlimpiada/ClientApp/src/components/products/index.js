@@ -9,6 +9,7 @@ import AddProduct from './AddProduct';
 import EditProduct from './EditProduct';
 import DeleteProduct from './DeleteProduct';
 import ItemPagination from './ItemPagination';
+import { push } from 'connected-react-router';
 import './index.scss';
 
 
@@ -58,8 +59,13 @@ class ProductsPage extends Component {
     }
   }
 
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps=(props, state) => {
+    //Тута пописати і змінити
+    ///333333333333
+    //4444444444444
+    //5555555555555
     //console.log('---nextProps---', props);
+    
     return { 
       products: props.products, 
       loading: props.IsLoading,
@@ -72,11 +78,27 @@ class ProductsPage extends Component {
   }
 
   componentDidMount() {
-    this.props.getProducts();
+    const page = parseInt(this.props.match.params.page, 10) || 1;
+    // This method is called when the component is first added to the document
+    this.searchDataFetched(page);
   }
 
-  callBackParams = (page) =>{
-    this.props.getProducts(page);
+  componentDidUpdate() {
+    const page = parseInt(this.props.match.params.page, 10) || 1;
+    if(this.props.currentPage!==page)
+    {
+      this.searchDataFetched(page);
+    }
+    // This method is called when the route parameters change
+  }
+
+  searchDataFetched(page) {
+      this.props.getProducts(page);
+  }
+
+  callBackParams = (page) => {
+    //console.log('props', this.props);
+    this.props.push(`/products/${page}`);
   }
 
   addProductToTable = (model) => {
@@ -170,7 +192,8 @@ const mapState = (state) => {
       IsLoading: get(state, 'products.delete.loading'),
       IsFailed: get(state, 'products.delete.failed'),
       IsSuccess: get(state, 'products.delete.success'),
-    }
+    },
+    
     
   }
 }
@@ -206,6 +229,11 @@ const mapDispatch = {
   cancelDeleteProduct: () => {
     return productsActions.cancelDeleteProduct();
   },
+  push: (url) => {
+    return (dispatch) => {
+        dispatch(push(url));
+    } 
+  }
 }
 
 ProductsPage.propTypes = propTypes;

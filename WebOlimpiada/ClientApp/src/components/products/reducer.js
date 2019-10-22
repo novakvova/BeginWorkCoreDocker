@@ -71,6 +71,7 @@ export const productsReducer = (state = initialState, action) => {
             newState = update.set(state, 'list.loading', true);
             newState = update.set(newState, 'list.success', false);
             newState = update.set(newState, 'list.failed', false);
+            newState = update.set(newState, 'list.currentPage', action.payload);
             break;
         }
 
@@ -261,9 +262,10 @@ export const getProducts = (page = 1) => {
 }
 
 export const productsGetActions = {
-    started: () => {
+    started: (page) => {
         return {
-            type: FETCH_PRODUCTS_STARTED
+            type: FETCH_PRODUCTS_STARTED,
+            payload: page
         }
     },
     success: (data) => {
@@ -491,7 +493,8 @@ export const deleteProductActions = {
 
 //Update list products
 const AddUpdateProducts = (page, dispatch) => {
-    dispatch(productsGetActions.started());
+
+    dispatch(productsGetActions.started(page));
 
     ProductsService.getProducts(page)
         .then((response) => {
